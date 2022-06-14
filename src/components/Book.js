@@ -1,7 +1,8 @@
 import React from "react";
+import noimg from "../images/noimg.png";
 
 const Book = function({ book, changeShelf }) {
-  const imageURL = book.imageLinks ? book.imageLinks.thumbnail : "";
+  const imageURL = book.imageLinks ? book.imageLinks.thumbnail : noimg;
 
   return (
     <li>

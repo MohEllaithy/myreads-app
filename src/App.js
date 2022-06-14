@@ -12,12 +12,14 @@ class BooksApp extends React.Component {
     searchResults: [],
   };
 
+  //Get all books from api
   componentDidMount() {
     BooksAPI.getAll().then((books) => {
       this.setState({ books: books });
     });
   }
 
+  //Clear search results and query string
   clearSearchResults = () => {
     this.setState((currentState) => ({
       ...currentState,
@@ -26,6 +28,7 @@ class BooksApp extends React.Component {
     }));
   };
 
+  //Handle the search results
   queryHandler = async (event) => {
     const query = event.target.value;
     const { books } = this.state;
@@ -40,24 +43,39 @@ class BooksApp extends React.Component {
     } else {
       const results = searchResults.map((result) => {
         const book = books.find((item) => item.id === result.id);
-        if (book) return { ...result, shelf: book.shelf };
-        else return result;
+        return book ? { ...result, shelf: book.shelf } : result;
       });
       this.setState(() => ({ searchResults: results }));
     }
   };
 
+  //Handle shelf change menu
   shelfChangeHandler = (event, book) => {
     const { value } = event.target;
-    const { books } = this.state;
+    const { books, searchResults } = this.state;
     const bookExists = books.find((item) => item.id === book.id);
 
-    if (bookExists) {
+    if (bookExists && value !== "none") {
       const newBooks = books.map((item) =>
         item.id === bookExists.id ? { ...item, shelf: value } : item
       );
+      const newResults = searchResults.map((item) =>
+        item.id === bookExists.id ? { ...item, shelf: value } : item
+      );
       this.setState(() => ({
-        books: [...newBooks],
+        books: newBooks,
+        searchResults: newResults,
+      }));
+    }
+
+    if (bookExists && value === "none") {
+      const newBooks = books.filter((item) => item.id !== bookExists.id);
+      const newResults = searchResults.map((item) =>
+        item.id === bookExists.id ? { ...item, shelf: value } : item
+      );
+      this.setState(() => ({
+        books: newBooks,
+        searchResults: newResults,
       }));
     }
 
@@ -71,7 +89,7 @@ class BooksApp extends React.Component {
 
   render() {
     const { searchResults, books } = this.state;
-    console.log(this.state);
+
     return (
       <div className="app">
         <Route
